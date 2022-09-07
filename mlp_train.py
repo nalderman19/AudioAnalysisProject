@@ -1,6 +1,7 @@
 # Implement multi layer perceptron
 
 import numpy as np
+from random import random
 
 # save activations and derivatives in __init__ class method
 # implement backprop
@@ -90,9 +91,36 @@ class MLP:
             weights = self.weights[i]
             derivatives = self.derivatives[i]
             
-            weights = weights + derivatives * learning rate
+            weights += derivatives * lr
     
-    return weights
+        return weights
+
+
+    def train(self, inputs, targets, epochs, lr):
+        
+        for i in range(epochs):
+            sumError = 0
+            for input, target in zip(inputs, targets): # get inputs and targets one by one
+                # preform forward propagation
+                output = self.forwardProp(input)
+                
+                # calculate error
+                error = target - output
+                
+                # backprop
+                self.backProp(error)
+                
+                # gradient descent
+                self.gradientDescent(lr)
+                
+                sumError += self._mse(target, output)
+                
+            # report error
+            #print("Error: {} at epoch {}".format(sumError / len(inputs), i+1))
+
+    def _mse(self, target, output): # mean squared error
+        return np.average((target - output)**2)
+
         
     def _sigmoid_derivative(self, x):
         return x * (1.0 - x)
@@ -104,27 +132,22 @@ class MLP:
 
 
 if __name__ == "__main__":
+    
+    # made up dataset to aid computing sum of inputs... see structure in spyder variable explorer
+    inputs = np.array([[random() / 2 for _ in range(2)] for _ in range(1000)])
+    targets = np.array([[i[0] + i[1]] for i in inputs])
+    
     # instantiate MLP class
     mlp = MLP(2, [5], 1)
     
-    # init some inputs & target
-    inputs = np.array([0.1,0.2])
-    target = np.array([0.3])
-    
-    # preform forward propagation
-    outputs = mlp.forwardProp(inputs)
-    
-    # calculate error
-    error = target - outputs
-    
-    # backprop
-    mlp.backProp(error)
-    
-    # gradient descent
-    mlp.gradientDescent(0.1)
-    
     # train (update weights based off of gradient descent)
+    mlp.train(inputs, targets, 50, 0.3)
     
-    # print output
-    print("Input is: {}".format(inputs))
-    print("Output is: {}".format(outputs))
+    # create dummy data to make predictions with
+    input = np.array([0.3,0.1])
+    target = np.array([0.4])
+    
+    output = mlp.forwardProp(input)
+    
+    print("The sum of {} and {} is {}".format(input[0],input[1],output[0]))
+    
