@@ -62,11 +62,28 @@ def build_model(input_shape):
 
     
 def predict(model, X, y):
+    '''
+    Uses model passed in to make a prediction given a datapoint
+    
+    Parameters
+    ----------
+    model : ()
+        Keras Model
+    X : (ndarray)
+        Input data
+    y : (int)
+        Target data
+    
+    Returns
+    -------
+    None.
+    '''    
     
     # prediction is a 2d array
+    #prediction = model.predict(X)
     prediction = model.predict(X[np.newaxis, ...])
     
-    # pick out max probabbility out of 10 genres
+    # pick out max probability out of 10 genres
     predicted_index = np.argmax(prediction, axis=1)
     
     print("Expected index: {}, Predicted Index: {}".format(y, predicted_index))
